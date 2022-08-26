@@ -1,4 +1,4 @@
-name: Linux
+name: Build
 
 on:
   push:
@@ -12,11 +12,11 @@ on:
 
 jobs:
   build-test:
-    runs-on: ubuntu-latest
-
     strategy:
       matrix:
         version: [net6.0, net7.0]
+
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
@@ -32,6 +32,12 @@ jobs:
         dotnet-version: '7.0.x'
         include-prerelease: true
 
+    - uses: actions/cache@v1
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
 
     - name: Install dependencies
       run: dotnet restore
