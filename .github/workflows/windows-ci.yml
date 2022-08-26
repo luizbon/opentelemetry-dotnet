@@ -31,10 +31,17 @@ jobs:
         dotnet-version: '7.0.x'
         include-prerelease: true
 
-    - name: Install dependencies
+    - uses: actions/cache@v1
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-${{ matrix.version }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ matrix.version }}-nuget-
+
+    - name: Install src dependencies
       run: dotnet restore
 
-    - name: Build
+    - name: Build src
       run: dotnet build --configuration Release --no-restore
 
     - name: Test ${{ matrix.version }}

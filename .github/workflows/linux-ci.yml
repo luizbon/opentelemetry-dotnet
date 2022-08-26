@@ -12,11 +12,11 @@ on:
 
 jobs:
   build-test:
-    runs-on: ubuntu-latest
-
     strategy:
       matrix:
         version: [net6.0, net7.0]
+
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
@@ -32,11 +32,17 @@ jobs:
         dotnet-version: '7.0.x'
         include-prerelease: true
 
+    - uses: actions/cache@v1
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-${{ matrix.version }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ matrix.version }}-nuget-
 
-    - name: Install dependencies
+    - name: Install src dependencies
       run: dotnet restore
 
-    - name: Build
+    - name: Build src
       run: dotnet build --configuration Release --no-restore
 
     - name: Test ${{ matrix.version }}
